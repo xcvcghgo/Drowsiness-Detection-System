@@ -4,14 +4,17 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from scipy.spatial import distance as dist
+from collections import deque
 import os
 import time
 
 app = Flask(**name**, static_folder=“templates”)
 CORS(app)
 
-mp_face = mp.solutions.face_mesh
+mp_face   = mp.solutions.face_mesh
 face_mesh = mp_face.FaceMesh(refine_landmarks=True, max_num_faces=1)
+
+# ===== نقاط العين (6 نقاط لكل عين) =====
 
 LEFT_EYE  = [33, 160, 158, 133, 153, 144]
 RIGHT_EYE = [362, 385, 387, 263, 373, 380]
@@ -24,21 +27,35 @@ EYE_CONTOUR_L = [33,7,163,144,145,153,154,155,133,173,157,158,159,160,161,246,33
 EYE_CONTOUR_R = [362,382,381,380,374,373,390,249,263,466,388,387,386,385,384,398,362]
 MOUTH_CONTOUR = [61,185,40,39,37,0,267,269,270,409,291,375,321,405,314,17,84,181,91,146,61]
 
-EAR_THRESHOLD    = 0.20
-MAR_THRESHOLD    = 0.65
-YAWN_FRAMES      = 10
+# ===== الإعدادات =====
+
+EAR_THRESHOLD_RATIO = 0.78   # نسبة من baseline الشخص (معايرة تلقائية)
+MAR_THRESHOLD       = 0.65   # عتبة التثاوب
+YAWN_FRAMES         = 10     # عدد frames للتأكيد على التثاوب
+CALIBRATION_FRAMES  = 45     # عدد frames للمعايرة (~3 ثواني)
+EAR_SMOOTH_FRAMES   = 7      # عدد frames للتمهيد
+
+# ===== متغيرات التمهيد والمعايرة =====
+
+ear_history      = deque(maxlen=EAR_SMOOTH_FRAMES)
+calibration_data = {“frames”: 0, “ear_sum”: 0.0, “done”: False}
+EAR_THRESHOLD    = 0.20  # قيمة افتراضية حتى تنتهي المعايرة
+
+# ===== حالة النظام =====
 
 current_data = {
 “eye”: 0, “jaw”: 0,
 “drowsy”: 0, “yawn”: 0,
 “sleep_count”: 0, “yawn_count”: 0,
 “alert_type”: None,
-“landmarks”: {}
+“landmarks”: {},
+“calibrated”: False,
+“ear_threshold”: 20,
+“calibration_progress”: 0
 }
 
-yawn_frames       = 0
-is_yawning        = False
-
+yawn_frames           = 0
+is_yawning            = False
 eye_closed_start_time = None
 is_drowsy_triggered   = False
 
@@ -52,14 +69,11 @@ return (A + B) / (2.0 * C) if C != 0 else 0
 def home():
 return send_from_directory(“templates”, “index.html”)
 
-@app.route(”/audio/<filename>”)
-def serve_audio(filename):
-audio_dir = os.path.dirname(os.path.abspath(**file**))
-return send_from_directory(audio_dir, filename)
-
 @app.route(”/api/process”, methods=[“POST”])
 def process():
-global yawn_frames, current_data, is_yawning, eye_closed_start_time, is_drowsy_triggered
+global yawn_frames, current_data, is_yawning
+global eye_closed_start_time, is_drowsy_triggered
+global EAR_THRESHOLD, calibration_data, ear_history
 
 ```
 file  = request.files["frame"]
@@ -84,19 +98,37 @@ if results.multi_face_landmarks:
     right_pts = np.array([[lm[i].x*w, lm[i].y*h] for i in RIGHT_EYE])
     mouth_pts = np.array([[lm[i].x*w, lm[i].y*h] for i in MOUTH])
 
-    ear_val = (calc_ratio(left_pts) + calc_ratio(right_pts)) / 2
+    ear_raw = (calc_ratio(left_pts) + calc_ratio(right_pts)) / 2
     mar_val = calc_ratio(mouth_pts)
 
-    eye_val = int(ear_val * 100)
+    # ===== معايرة تلقائية لكل مستخدم =====
+    if not calibration_data["done"]:
+        calibration_data["ear_sum"] += ear_raw
+        calibration_data["frames"]  += 1
+        progress = int((calibration_data["frames"] / CALIBRATION_FRAMES) * 100)
+        current_data["calibration_progress"] = min(progress, 100)
+
+        if calibration_data["frames"] >= CALIBRATION_FRAMES:
+            baseline      = calibration_data["ear_sum"] / calibration_data["frames"]
+            EAR_THRESHOLD = baseline * EAR_THRESHOLD_RATIO
+            calibration_data["done"]          = True
+            current_data["calibrated"]        = True
+            current_data["ear_threshold"]     = int(EAR_THRESHOLD * 100)
+            current_data["calibration_progress"] = 100
+
+    # ===== تمهيد القراءة (يمنع التذبذب) =====
+    ear_history.append(ear_raw)
+    ear_smooth = sum(ear_history) / len(ear_history)
+
+    eye_val = int(ear_smooth * 100)
     jaw_val = int(mar_val * 100)
 
-    if ear_val < EAR_THRESHOLD:
+    # ===== كشف النعاس =====
+    if ear_smooth < EAR_THRESHOLD:
         if eye_closed_start_time is None:
             eye_closed_start_time = time.time()
-        
-        elapsed_time = time.time() - eye_closed_start_time
-
-        if elapsed_time >= 6.0:
+        elapsed = time.time() - eye_closed_start_time
+        if elapsed >= 6.0:
             alert = "emergency"
         else:
             alert = "warning"
@@ -105,13 +137,11 @@ if results.multi_face_landmarks:
                 drowsy = 1
                 is_drowsy_triggered = True
     else:
-        if eye_closed_start_time is None:
-            alert = None
-        else:
-            alert = "clear"
+        alert = "clear" if eye_closed_start_time else None
         eye_closed_start_time = None
         is_drowsy_triggered   = False
 
+    # ===== كشف التثاوب =====
     if mar_val > MAR_THRESHOLD:
         yawn_frames += 1
         if yawn_frames >= YAWN_FRAMES:
@@ -142,6 +172,7 @@ else:
     is_drowsy_triggered   = False
     yawn_frames           = 0
     is_yawning            = False
+    ear_history.clear()
 
 current_data.update({
     "eye": eye_val, "jaw": jaw_val,
@@ -155,23 +186,29 @@ return jsonify(current_data)
 
 @app.route(”/api/stop”, methods=[“POST”])
 def stop_system():
-global eye_closed_start_time, is_drowsy_triggered, yawn_frames, is_yawning, current_data
+global eye_closed_start_time, is_drowsy_triggered, yawn_frames
+global is_yawning, current_data, calibration_data, EAR_THRESHOLD, ear_history
 
 ```
 eye_closed_start_time = None
 is_drowsy_triggered   = False
 yawn_frames           = 0
 is_yawning            = False
+ear_history.clear()
+
+# إعادة تعيين المعايرة عند الإيقاف
+calibration_data = {"frames": 0, "ear_sum": 0.0, "done": False}
+EAR_THRESHOLD    = 0.20
 
 current_data.update({
-    "eye": 0,
-    "jaw": 0,
-    "drowsy": 0,
-    "yawn": 0,
-    "sleep_count": 0,
-    "yawn_count": 0,
+    "eye": 0, "jaw": 0,
+    "drowsy": 0, "yawn": 0,
+    "sleep_count": 0, "yawn_count": 0,
     "alert_type": "clear",
-    "landmarks": {}
+    "landmarks": {},
+    "calibrated": False,
+    "ear_threshold": 20,
+    "calibration_progress": 0
 })
 return jsonify(current_data)
 ```
@@ -181,5 +218,4 @@ def data():
 return jsonify(current_data)
 
 if **name** == “**main**”:
-import os
 app.run(host=“0.0.0.0”, port=int(os.environ.get(“PORT”, 5000)), debug=True)
