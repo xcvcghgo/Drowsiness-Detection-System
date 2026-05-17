@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /pro
 
 COPY requirements.txt .
 
@@ -16,4 +16,4 @@ COPY . .
 
 ENV PORT=10000
 
-CMD ["python", "app.py"]
+CMD ["python", "pro.py"]
