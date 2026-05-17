@@ -2,6 +2,6 @@ Flask
 Flask-CORS
 opencv-python-headless
 numpy
-mediapipe
+mediapipe==0.10.9
 scipy
 gunicorn
