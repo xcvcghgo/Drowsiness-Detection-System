@@ -185,6 +185,9 @@ border:1px solid #e2e8f0; text-align:center;
   </div>
 
   <div class="alerts-area">
+    <div class="alert" id="alertCalib" style="background:#ebf8ff;color:#2c5282;border-color:#90cdf4;display:none;">
+      Calibrating... <span id="calibPct">0</span>% — keep eyes open and look at camera
+    </div>
     <div class="alert alert-warning"   id="alertDrowsy">WARNING - Drowsiness detected, please stay alert</div>
     <div class="alert alert-yawn"      id="alertYawn">YAWN DETECTED - You may need a break</div>
     <div class="alert alert-emergency" id="alertEmergency">DANGER - Eyes closed for too long, wake up now</div>
@@ -271,113 +274,74 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-function playBeep(freq, duration, type = 'sine', volume = 0.6) {
-  const ac   = getAudioCtx();
-  const osc  = ac.createOscillator();
-  const gain = ac.createGain();
-  osc.connect(gain);
-  gain.connect(ac.destination);
-  osc.frequency.value = freq;
-  osc.type = type;
-  gain.gain.setValueAtTime(volume, ac.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
-  osc.start(ac.currentTime);
-  osc.stop(ac.currentTime + duration);
-}
-
-const SOUND_COOLDOWN = 3000;
+const SOUND_DURATION = 3.0;
 const lastSoundTime  = { warning: 0, yawn: 0, emergency: 0 };
 
-const SOUND_DURATION = 3.0;
-const activeNodes    = {};
+function playTone(freqA, freqB, stepSec, waveType, volume, duration) {
+  try {
+    const ac   = getAudioCtx();
+    if (ac.state === 'suspended') ac.resume();
+    const osc  = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.type = waveType;
 
-// تشغيل صوت مستمر مع تذبذب بين ترددين (إنذار حقيقي)
-function playAlarmTone(freqA, freqB, stepSec, waveType, volume, duration) {
-  const ac   = getAudioCtx();
-  const osc  = ac.createOscillator();
-  const gain = ac.createGain();
-  osc.connect(gain);
-  gain.connect(ac.destination);
-  osc.type = waveType;
-
-  // برمجة التذبذب بين الترددين طوال المدة كاملة
-  const steps = Math.ceil(duration / stepSec);
-  for (let i = 0; i < steps; i++) {
-    osc.frequency.setValueAtTime(
-      i % 2 === 0 ? freqA : freqB,
-      ac.currentTime + i * stepSec
-    );
-  }
-
-  // ارتفاع سريع ثم ثبات ثم خفوت في النهاية
-  gain.gain.setValueAtTime(0, ac.currentTime);
-  gain.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.05);
-  gain.gain.setValueAtTime(volume, ac.currentTime + duration - 0.15);
-  gain.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
-
-  osc.start(ac.currentTime);
-  osc.stop(ac.currentTime + duration);
-  return { osc, gain };
+    const steps = Math.ceil(duration / stepSec);
+    for (let i = 0; i < steps; i++) {
+      osc.frequency.setValueAtTime(
+        i % 2 === 0 ? freqA : freqB,
+        ac.currentTime + i * stepSec
+      );
+    }
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.05);
+    gain.gain.setValueAtTime(volume, ac.currentTime + duration - 0.15);
+    gain.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + duration);
+  } catch (e) { console.warn('Audio:', e); }
 }
 
-// تشغيل صوت مستمر مع مسح تصاعدي (sweep) للتثاوب
-function playSweepTone(freqStart, freqEnd, waveType, volume, duration) {
-  const ac   = getAudioCtx();
-  const osc  = ac.createOscillator();
-  const gain = ac.createGain();
-  osc.connect(gain);
-  gain.connect(ac.destination);
-  osc.type = waveType;
-
-  // تصاعد من freqStart إلى freqEnd ثم عودة
-  const mid = duration / 2;
-  osc.frequency.setValueAtTime(freqStart, ac.currentTime);
-  osc.frequency.linearRampToValueAtTime(freqEnd,   ac.currentTime + mid);
-  osc.frequency.linearRampToValueAtTime(freqStart, ac.currentTime + duration);
-
-  gain.gain.setValueAtTime(0, ac.currentTime);
-  gain.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.05);
-  gain.gain.setValueAtTime(volume, ac.currentTime + duration - 0.2);
-  gain.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
-
-  osc.start(ac.currentTime);
-  osc.stop(ac.currentTime + duration);
-  return { osc, gain };
+function playSweep(freqStart, freqEnd, volume, duration) {
+  try {
+    const ac   = getAudioCtx();
+    if (ac.state === 'suspended') ac.resume();
+    const osc  = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freqStart, ac.currentTime);
+    osc.frequency.linearRampToValueAtTime(freqEnd,   ac.currentTime + duration / 2);
+    osc.frequency.linearRampToValueAtTime(freqStart, ac.currentTime + duration);
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.05);
+    gain.gain.setValueAtTime(volume, ac.currentTime + duration - 0.2);
+    gain.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + duration);
+  } catch (e) { console.warn('Audio:', e); }
 }
 
 function playSound(type) {
-  if (activeNodes[type]) return; // لا تشغل لو ما زال يعمل
+  const now = Date.now();
+  // كل صوت يمنع نفسه من التكرار لمدة 3 ثواني
+  if (now - lastSoundTime[type] < SOUND_DURATION * 1000) return;
+  lastSoundTime[type] = now;
 
   if (type === 'yawn') {
-    const now = Date.now();
-    if (now - lastSoundTime.yawn < SOUND_COOLDOWN) return;
-    lastSoundTime.yawn = now;
-    // تثاوب: مسح تصاعدي مستمر من 400 إلى 900 هرتز وعودة
-    activeNodes.yawn = playSweepTone(400, 900, 'sine', 0.85, SOUND_DURATION);
-    setTimeout(() => { activeNodes.yawn = null; }, SOUND_DURATION * 1000);
-
+    playSweep(400, 900, 0.85, SOUND_DURATION);
   } else if (type === 'warning') {
-    // إنذار تحذير: تذبذب بين 800 و 1100 كل 300ms - صوت إنذار مستمر مزعج
-    activeNodes.warning = playAlarmTone(800, 1100, 0.3, 'square', 0.9, SOUND_DURATION);
-    setTimeout(() => { activeNodes.warning = null; }, SOUND_DURATION * 1000);
-
+    playTone(800, 1100, 0.3, 'square', 0.9, SOUND_DURATION);
   } else if (type === 'emergency') {
-    // إنذار طوارئ: تذبذب بين 1200 و 1700 كل 150ms - أشد إزعاجاً
-    activeNodes.emergency = playAlarmTone(1200, 1700, 0.15, 'sawtooth', 1.0, SOUND_DURATION);
-    setTimeout(() => { activeNodes.emergency = null; }, SOUND_DURATION * 1000);
+    playTone(1200, 1700, 0.15, 'sawtooth', 1.0, SOUND_DURATION);
   }
 }
 
 function stopSound(type) {
-  if (activeNodes[type]) {
-    try {
-      const ac = getAudioCtx();
-      activeNodes[type].gain.gain.cancelScheduledValues(ac.currentTime);
-      activeNodes[type].gain.gain.setValueAtTime(0, ac.currentTime);
-      activeNodes[type].osc.stop(ac.currentTime + 0.05);
-    } catch (_) {}
-    activeNodes[type] = null;
-  }
+  // نصفّر الوقت عشان يقدر يشتغل مرة ثانية بعدين
+  lastSoundTime[type] = 0;
 }
 
 function stopAllSounds() {
@@ -487,6 +451,15 @@ function loop() {
 
 // ===== تحديث الواجهة =====
 function updateUI(d) {
+  // مؤشر المعايرة
+  const calibEl = document.getElementById('alertCalib');
+  if (!d.calibrated) {
+    calibEl.style.display = 'block';
+    document.getElementById('calibPct').textContent = d.calibration_progress || 0;
+  } else {
+    calibEl.style.display = 'none';
+  }
+
   document.getElementById('eyeVal').textContent  = d.eye + '%';
   document.getElementById('jawVal').textContent  = d.jaw + '%';
   document.getElementById('eyeBar').style.width = Math.min(d.eye, 100) + '%';
