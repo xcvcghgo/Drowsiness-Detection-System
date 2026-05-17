@@ -1,7 +1,7 @@
-pygame
-streamlit
-mediapipe
-opencv-python
+Flask
+Flask-CORS
+opencv-python-headless
 numpy
 mediapipe
 scipy
+gunicorn
