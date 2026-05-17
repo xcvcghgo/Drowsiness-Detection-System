@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -8,118 +9,118 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
-  min-height: 100vh;
-  padding: 20px;
+font-family: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, sans-serif;
+background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+min-height: 100vh;
+padding: 20px;
 }
 
 .container {
-  max-width: 520px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+max-width: 520px;
+margin: 0 auto;
+background: white;
+border-radius: 24px;
+overflow: hidden;
+box-shadow: 0 20px 60px rgba(0,0,0,0.12);
 }
 
 .header {
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
-  color: white;
-  padding: 22px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+color: white;
+padding: 22px 24px;
+display: flex;
+justify-content: space-between;
+align-items: center;
 }
 .header-left { display:flex; align-items:center; gap:12px; }
 .header-icon {
-  width:48px; height:48px;
-  background: rgba(255,255,255,0.15);
-  border-radius:12px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:800; color:white; letter-spacing:-.5px;
+width:48px; height:48px;
+background: rgba(255,255,255,0.15);
+border-radius:12px;
+display:flex; align-items:center; justify-content:center;
+font-size:13px; font-weight:800; color:white; letter-spacing:-.5px;
 }
 .header-title h1 { font-size:17px; font-weight:700; line-height:1.5; }
 .header-title span { font-size:12px; opacity:.6; }
 .status-badge {
-  display:flex; align-items:center; gap:7px;
-  font-size:12px; color:#a0aec0; text-align:right;
+display:flex; align-items:center; gap:7px;
+font-size:12px; color:#a0aec0; text-align:right;
 }
 .status-dot {
-  width:8px; height:8px;
-  background:#48bb78; border-radius:50%;
-  animation: blink 2s infinite;
-  flex-shrink:0;
+width:8px; height:8px;
+background:#48bb78; border-radius:50%;
+animation: blink 2s infinite;
+flex-shrink:0;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 .alerts-area { padding: 0 16px; }
 
 .alert {
-  padding: 13px 18px;
-  border-radius: 10px;
-  margin-top: 14px;
-  font-weight: 700;
-  font-size: 14px;
-  text-align: center;
-  display: none;
-  border-width: 2px;
-  border-style: solid;
+padding: 13px 18px;
+border-radius: 10px;
+margin-top: 14px;
+font-weight: 700;
+font-size: 14px;
+text-align: center;
+display: none;
+border-width: 2px;
+border-style: solid;
 }
 .alert.show { display:block; }
 .alert-warning   { background:#fed7d7; color:#742a2a; border-color:#fc8181; }
 .alert-yawn      { background:#fefcbf; color:#744210; border-color:#f6e05e; }
 .alert-emergency {
-  background:#feb2b2; color:#63171b; border-color:#e53e3e;
-  animation: shake .5s ease;
+background:#feb2b2; color:#63171b; border-color:#e53e3e;
+animation: shake .5s ease;
 }
 @keyframes shake {
-  0%,100%{transform:translateX(0)}
-  20%{transform:translateX(-7px)}
-  40%{transform:translateX(7px)}
-  60%{transform:translateX(-5px)}
-  80%{transform:translateX(5px)}
+0%,100%{transform:translateX(0)}
+20%{transform:translateX(-7px)}
+40%{transform:translateX(7px)}
+60%{transform:translateX(-5px)}
+80%{transform:translateX(5px)}
 }
 
 .content { padding: 18px; }
 
 .camera-label {
-  font-size:11px; font-weight:700; color:#718096;
-  text-transform:uppercase; letter-spacing:.8px;
-  display:block; margin-bottom:8px; text-align:center;
+font-size:11px; font-weight:700; color:#718096;
+text-transform:uppercase; letter-spacing:.8px;
+display:block; margin-bottom:8px; text-align:center;
 }
 .camera-wrapper {
-  position:relative;
-  width:100%; border-radius:16px;
-  overflow:hidden; background:#1a202c;
-  min-height:280px;
-  display:flex; align-items:center; justify-content:center;
-  margin-bottom:14px;
+position:relative;
+width:100%; border-radius:16px;
+overflow:hidden; background:#1a202c;
+min-height:280px;
+display:flex; align-items:center; justify-content:center;
+margin-bottom:14px;
 }
 #videoEl {
-  width:100%; display:block;
-  transform: scaleX(-1);
+width:100%; display:block;
+transform: scaleX(-1);
 }
 #overlayCanvas {
-  position:absolute; top:0; left:0;
-  width:100%; height:100%;
-  pointer-events:none;
-  transform: scaleX(-1);
+position:absolute; top:0; left:0;
+width:100%; height:100%;
+pointer-events:none;
+transform: scaleX(-1);
 }
 #camStatus {
-  position:absolute;
-  color:white; font-size:14px; text-align:center;
-  line-height:1.7; padding:20px;
+position:absolute;
+color:white; font-size:14px; text-align:center;
+line-height:1.7; padding:20px;
 }
 
 .controls { display:flex; gap:12px; margin-bottom:18px; }
 button {
-  flex:1; padding:13px; border:none;
-  border-radius:12px; font-size:14px;
-  font-weight:700; cursor:pointer;
-  transition: all .2s ease;
-  letter-spacing:.5px;
-  text-transform:uppercase;
+flex:1; padding:13px; border:none;
+border-radius:12px; font-size:14px;
+font-weight:700; cursor:pointer;
+transition: all .2s ease;
+letter-spacing:.5px;
+text-transform:uppercase;
 }
 .btn-start { background:linear-gradient(135deg,#48bb78,#38a169); color:white; }
 .btn-start:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 16px rgba(72,187,120,.35); }
@@ -128,19 +129,19 @@ button {
 button:disabled { opacity:.45; cursor:not-allowed; }
 
 .stats-grid {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:12px; margin-bottom:16px;
+display:grid; grid-template-columns:1fr 1fr;
+gap:12px; margin-bottom:16px;
 }
 .stat-card {
-  background:linear-gradient(135deg,#f7fafc,#edf2f7);
-  border-radius:16px; padding:16px;
-  text-align:center; border:1px solid #e2e8f0;
-  transition: transform .2s, box-shadow .2s;
+background:linear-gradient(135deg,#f7fafc,#edf2f7);
+border-radius:16px; padding:16px;
+text-align:center; border:1px solid #e2e8f0;
+transition: transform .2s, box-shadow .2s;
 }
 .stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 16px rgba(0,0,0,.08); }
 .stat-label {
-  font-size:11px; font-weight:700; color:#718096;
-  text-transform:uppercase; letter-spacing:.4px; margin-bottom:10px;
+font-size:11px; font-weight:700; color:#718096;
+text-transform:uppercase; letter-spacing:.4px; margin-bottom:10px;
 }
 .stat-value { font-size:32px; font-weight:800; color:#1a202c; margin-bottom:8px; }
 .stat-bar { width:100%; height:5px; background:#cbd5e0; border-radius:3px; overflow:hidden; }
@@ -149,20 +150,21 @@ button:disabled { opacity:.45; cursor:not-allowed; }
 .fill-jaw { background:linear-gradient(90deg,#ed8936,#c05621); }
 
 .indicator {
-  display:inline-block; width:10px; height:10px;
-  border-radius:50%; margin-top:8px;
-  background:#cbd5e0; transition:all .3s;
+display:inline-block; width:10px; height:10px;
+border-radius:50%; margin-top:8px;
+background:#cbd5e0; transition:all .3s;
 }
 .indicator.active { background:#48bb78; box-shadow:0 0 0 4px rgba(72,187,120,.25); }
 
 .info-section {
-  background:linear-gradient(135deg,#f7fafc,#edf2f7);
-  border-radius:16px; padding:16px;
-  border:1px solid #e2e8f0; text-align:center;
+background:linear-gradient(135deg,#f7fafc,#edf2f7);
+border-radius:16px; padding:16px;
+border:1px solid #e2e8f0; text-align:center;
 }
 .info-title { font-size:14px; font-weight:700; color:#1a202c; margin-bottom:8px; }
 .info-text  { font-size:12px; color:#4a5568; line-height:1.8; }
 </style>
+
 </head>
 <body>
 
@@ -190,58 +192,60 @@ button:disabled { opacity:.45; cursor:not-allowed; }
 
   <div class="content">
 
-    <label class="camera-label">Camera Feed</label>
-    <div class="camera-wrapper">
-      <video id="videoEl" autoplay playsinline muted></video>
-      <canvas id="overlayCanvas"></canvas>
-      <span id="camStatus">Press Start to activate camera</span>
+```
+<label class="camera-label">Camera Feed</label>
+<div class="camera-wrapper">
+  <video id="videoEl" autoplay playsinline muted></video>
+  <canvas id="overlayCanvas"></canvas>
+  <span id="camStatus">Press Start to activate camera</span>
+</div>
+
+<div class="controls">
+  <button class="btn-start" id="startBtn" onclick="startCamera()">Start</button>
+  <button class="btn-stop"  id="stopBtn"  onclick="stopCamera()" disabled>Stop</button>
+</div>
+
+<div class="stats-grid">
+
+  <div class="stat-card">
+    <div class="stat-label">Eye Closure</div>
+    <div class="stat-value" id="eyeVal">0%</div>
+    <div class="stat-bar">
+      <div class="stat-bar-fill fill-eye" id="eyeBar" style="width:0%"></div>
     </div>
+  </div>
 
-    <div class="controls">
-      <button class="btn-start" id="startBtn" onclick="startCamera()">Start</button>
-      <button class="btn-stop"  id="stopBtn"  onclick="stopCamera()" disabled>Stop</button>
+  <div class="stat-card">
+    <div class="stat-label">Jaw Opening</div>
+    <div class="stat-value" id="jawVal">0%</div>
+    <div class="stat-bar">
+      <div class="stat-bar-fill fill-jaw" id="jawBar" style="width:0%"></div>
     </div>
+  </div>
 
-    <div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Drowsiness Count</div>
+    <div class="stat-value" id="sleepCount">0</div>
+    <div><span class="indicator" id="drowsyInd"></span></div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">Eye Closure</div>
-        <div class="stat-value" id="eyeVal">0%</div>
-        <div class="stat-bar">
-          <div class="stat-bar-fill fill-eye" id="eyeBar" style="width:0%"></div>
-        </div>
-      </div>
+  <div class="stat-card">
+    <div class="stat-label">Yawn Count</div>
+    <div class="stat-value" id="yawnCount">0</div>
+    <div><span class="indicator" id="yawnInd"></span></div>
+  </div>
 
-      <div class="stat-card">
-        <div class="stat-label">Jaw Opening</div>
-        <div class="stat-value" id="jawVal">0%</div>
-        <div class="stat-bar">
-          <div class="stat-bar-fill fill-jaw" id="jawBar" style="width:0%"></div>
-        </div>
-      </div>
+</div>
 
-      <div class="stat-card">
-        <div class="stat-label">Drowsiness Count</div>
-        <div class="stat-value" id="sleepCount">0</div>
-        <div><span class="indicator" id="drowsyInd"></span></div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Yawn Count</div>
-        <div class="stat-value" id="yawnCount">0</div>
-        <div><span class="indicator" id="yawnInd"></span></div>
-      </div>
-
-    </div>
-
-    <div class="info-section">
-      <div class="info-title">How It Works</div>
-      <div class="info-text">
-        Uses MediaPipe to track facial landmarks and calculates
-        Eye Aspect Ratio (EAR) and Mouth Aspect Ratio (MAR)
-        to detect drowsiness and yawning in real time.
-      </div>
-    </div>
+<div class="info-section">
+  <div class="info-title">How It Works</div>
+  <div class="info-text">
+    Uses MediaPipe to track facial landmarks and calculates
+    Eye Aspect Ratio (EAR) and Mouth Aspect Ratio (MAR)
+    to detect drowsiness and yawning in real time.
+  </div>
+</div>
+```
 
   </div>
 </div>
@@ -281,58 +285,105 @@ function playBeep(freq, duration, type = 'sine', volume = 0.6) {
   osc.stop(ac.currentTime + duration);
 }
 
-const soundPlaying = { warning: null, emergency: null };
-
 const SOUND_COOLDOWN = 3000;
 const lastSoundTime  = { warning: 0, yawn: 0, emergency: 0 };
 
-const SOUND_DURATION  = 3000;
-const soundStopTimers = { warning: null, emergency: null };
+const SOUND_DURATION = 3.0;
+const activeNodes    = {};
+
+// تشغيل صوت مستمر مع تذبذب بين ترددين (إنذار حقيقي)
+function playAlarmTone(freqA, freqB, stepSec, waveType, volume, duration) {
+  const ac   = getAudioCtx();
+  const osc  = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.type = waveType;
+
+  // برمجة التذبذب بين الترددين طوال المدة كاملة
+  const steps = Math.ceil(duration / stepSec);
+  for (let i = 0; i < steps; i++) {
+    osc.frequency.setValueAtTime(
+      i % 2 === 0 ? freqA : freqB,
+      ac.currentTime + i * stepSec
+    );
+  }
+
+  // ارتفاع سريع ثم ثبات ثم خفوت في النهاية
+  gain.gain.setValueAtTime(0, ac.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.05);
+  gain.gain.setValueAtTime(volume, ac.currentTime + duration - 0.15);
+  gain.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
+
+  osc.start(ac.currentTime);
+  osc.stop(ac.currentTime + duration);
+  return { osc, gain };
+}
+
+// تشغيل صوت مستمر مع مسح تصاعدي (sweep) للتثاوب
+function playSweepTone(freqStart, freqEnd, waveType, volume, duration) {
+  const ac   = getAudioCtx();
+  const osc  = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.type = waveType;
+
+  // تصاعد من freqStart إلى freqEnd ثم عودة
+  const mid = duration / 2;
+  osc.frequency.setValueAtTime(freqStart, ac.currentTime);
+  osc.frequency.linearRampToValueAtTime(freqEnd,   ac.currentTime + mid);
+  osc.frequency.linearRampToValueAtTime(freqStart, ac.currentTime + duration);
+
+  gain.gain.setValueAtTime(0, ac.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.05);
+  gain.gain.setValueAtTime(volume, ac.currentTime + duration - 0.2);
+  gain.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
+
+  osc.start(ac.currentTime);
+  osc.stop(ac.currentTime + duration);
+  return { osc, gain };
+}
 
 function playSound(type) {
+  if (activeNodes[type]) return; // لا تشغل لو ما زال يعمل
+
   if (type === 'yawn') {
     const now = Date.now();
     if (now - lastSoundTime.yawn < SOUND_COOLDOWN) return;
     lastSoundTime.yawn = now;
-    // تثاوب: نبضات تصاعدية مزعجة لمدة 3 ثواني
-    const times = [0,250,500,800,1100,1400,1700,2000,2300,2600];
-    const freqs  = [600,750,900,600,750,900,600,750,900,750];
-    times.forEach((t, i) => setTimeout(() => playBeep(freqs[i], 0.22, 'square', 0.9), t));
+    // تثاوب: مسح تصاعدي مستمر من 400 إلى 900 هرتز وعودة
+    activeNodes.yawn = playSweepTone(400, 900, 'sine', 0.85, SOUND_DURATION);
+    setTimeout(() => { activeNodes.yawn = null; }, SOUND_DURATION * 1000);
 
   } else if (type === 'warning') {
-    if (soundPlaying.warning) return;
-    // تحذير: صفيران متناوبان سريعان - يوقف نفسه بعد 3 ثواني
-    let toggle = false;
-    soundPlaying.warning = setInterval(() => {
-      playBeep(toggle ? 1050 : 850, 0.18, 'square', 0.9);
-      toggle = !toggle;
-    }, 350);
-    clearTimeout(soundStopTimers.warning);
-    soundStopTimers.warning = setTimeout(() => stopSound('warning'), SOUND_DURATION);
+    // إنذار تحذير: تذبذب بين 800 و 1100 كل 300ms - صوت إنذار مستمر مزعج
+    activeNodes.warning = playAlarmTone(800, 1100, 0.3, 'square', 0.9, SOUND_DURATION);
+    setTimeout(() => { activeNodes.warning = null; }, SOUND_DURATION * 1000);
 
   } else if (type === 'emergency') {
-    if (soundPlaying.emergency) return;
-    // طوارئ: 3 نغمات حادة متسارعة - يوقف نفسه بعد 3 ثواني
-    soundPlaying.emergency = setInterval(() => {
-      playBeep(1400, 0.12, 'sawtooth', 1.0);
-      setTimeout(() => playBeep(1100, 0.12, 'sawtooth', 1.0), 150);
-      setTimeout(() => playBeep(1600, 0.12, 'sawtooth', 1.0), 300);
-    }, 600);
-    clearTimeout(soundStopTimers.emergency);
-    soundStopTimers.emergency = setTimeout(() => stopSound('emergency'), SOUND_DURATION);
+    // إنذار طوارئ: تذبذب بين 1200 و 1700 كل 150ms - أشد إزعاجاً
+    activeNodes.emergency = playAlarmTone(1200, 1700, 0.15, 'sawtooth', 1.0, SOUND_DURATION);
+    setTimeout(() => { activeNodes.emergency = null; }, SOUND_DURATION * 1000);
   }
 }
 
 function stopSound(type) {
-  if (soundPlaying[type]) {
-    clearInterval(soundPlaying[type]);
-    soundPlaying[type] = null;
+  if (activeNodes[type]) {
+    try {
+      const ac = getAudioCtx();
+      activeNodes[type].gain.gain.cancelScheduledValues(ac.currentTime);
+      activeNodes[type].gain.gain.setValueAtTime(0, ac.currentTime);
+      activeNodes[type].osc.stop(ac.currentTime + 0.05);
+    } catch (_) {}
+    activeNodes[type] = null;
   }
 }
 
 function stopAllSounds() {
   stopSound('warning');
   stopSound('emergency');
+  stopSound('yawn');
 }
 
 // ===== التنبيهات المرئية =====
@@ -504,5 +555,6 @@ function drawLandmarks(lm) {
   drawPath(lm.mouth, 'rgba(255,180,0,0.85)', 1.8);
 }
 </script>
+
 </body>
 </html>
