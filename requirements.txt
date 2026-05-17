@@ -1,0 +1,7 @@
+pygame
+streamlit
+mediapipe
+opencv-python
+numpy
+mediapipe
+scipy
